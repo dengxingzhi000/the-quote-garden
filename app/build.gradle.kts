@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.hilt.android)
-    ksp("com.google.dagger:hilt-compiler:2.51.1")
+    ksp("com.google.dagger:hilt-compiler:${libs.versions.hilt.get()}")
     implementation(libs.retrofit.core)
     implementation(libs.kotlinx.serialization.json)
 }
