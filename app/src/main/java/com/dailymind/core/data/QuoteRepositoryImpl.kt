@@ -20,7 +20,18 @@ class QuoteRepositoryImpl @Inject constructor(
         dao.getAll().firstOrNull()?.toModel()
 
     override suspend fun getRandomQuote(): Quote =
-        (dao.getRandom() ?: throw NoSuchElementException("no quotes offline")).toModel()
+        (dao.getRandom() ?: QuoteEntity(
+            id = "fallback-1",
+            content = "The only way to do great work is to love what you do.",
+            translation = "成就伟大事业的唯一方法是热爱你的工作。",
+            author = "Steve Jobs",
+            category = "motivation",
+            difficulty = 1,
+            audioUrl = null,
+            imageUrl = null,
+            updatedAt = System.currentTimeMillis(),
+            deletedAt = null
+        )).toModel()
 
     override suspend fun sync(): Result<Unit> = runCatching {
         val max = dao.getMaxUpdatedAt() ?: 0L
