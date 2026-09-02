@@ -37,6 +37,8 @@ dependencies {
     implementation(libs.work.runtime)
     implementation(libs.datastore.preferences)
     ksp("com.google.dagger:hilt-compiler:2.60.1")
+    implementation(libs.okhttp)
     implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
 }
