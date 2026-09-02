@@ -8,9 +8,16 @@ plugins {
 }
 android {
     namespace = "com.dailymind"
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig { minSdk = 24; targetSdk = 35 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
     buildFeatures { compose = true }
+}
+kotlin {
+    jvmToolchain(17)
 }
 dependencies {
     val bom = libs.androidx.compose.bom
