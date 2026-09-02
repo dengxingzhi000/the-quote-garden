@@ -23,7 +23,7 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.work.runtime)
     implementation(libs.datastore.preferences)
-    ksp("com.google.dagger:hilt-compiler:${libs.versions.hilt.get()}")
+    ksp("com.google.dagger:hilt-compiler:2.60.1")
     implementation(libs.retrofit.core)
     implementation(libs.kotlinx.serialization.json)
 }
