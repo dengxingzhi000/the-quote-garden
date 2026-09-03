@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <queries>
+        <provider android:authorities="com.google.android.gms.fonts">
+            <package android:name="com.google.android.gms" />
+        </provider>
+    </queries>
+
     <application
         android:name=".DailyMindApp"
         android:allowBackup="true"
