@@ -13,6 +13,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures { compose = true }
 }
@@ -38,6 +39,7 @@ dependencies {
     implementation(libs.work.runtime)
     implementation(libs.datastore.preferences)
     ksp("com.google.dagger:hilt-compiler:2.60.1")
+    coreLibraryDesugaring(libs.desugaring)
     implementation(libs.okhttp)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlinx.serialization)

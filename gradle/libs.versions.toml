@@ -37,6 +37,7 @@ retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.r
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 retrofit-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "converter" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+desugaring = { group = "com.android.tools", name = "desugar_jdk_libs", version = "2.1.4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
