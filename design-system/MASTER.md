@@ -3,6 +3,10 @@
 > **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
 > If that file exists, its rules **override** this Master file.
 > If not, strictly follow the rules below.
+> **OVERRIDE (2026-09-03):** For Home, Favorite, and Theme, the quiet-luxury spec in
+> `docs/superpowers/specs/2026-09-03-dailymind-editorial-redesign-design.md` supersedes
+> this file (palette, typography, dark-mode rule). This Master file remains in force
+> for all other pages until migrated.
 
 ---
 
