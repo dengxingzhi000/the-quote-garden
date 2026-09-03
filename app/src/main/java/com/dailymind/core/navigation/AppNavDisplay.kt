@@ -17,7 +17,7 @@ fun AppNavDisplay() {
         entryProvider = { route ->
             when (route) {
                 is Route.Home -> NavEntry(route) { HomeScreen(onNavigateToFavorite = { backStack.add(Route.Favorite) }) }
-                is Route.Favorite -> NavEntry(route) { FavoriteScreen() }
+                is Route.Favorite -> NavEntry(route) { FavoriteScreen(onNavigateBack = { backStack.removeLastOrNull() }) }
                 else -> NavEntry(route) { }
             }
         }
