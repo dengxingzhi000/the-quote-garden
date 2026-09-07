@@ -5,7 +5,9 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -33,6 +35,14 @@ class DailySyncWorker @AssistedInject constructor(
                     Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
                 ).build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork("daily_sync", ExistingPeriodicWorkPolicy.KEEP, req)
+        }
+
+        fun enqueueImmediate(context: Context) {
+            val req = OneTimeWorkRequestBuilder<DailySyncWorker>()
+                .setConstraints(
+                    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+                ).build()
+            WorkManager.getInstance(context).enqueueUniqueWork("daily_sync_initial", ExistingWorkPolicy.KEEP, req)
         }
     }
 }

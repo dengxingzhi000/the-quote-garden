@@ -17,5 +17,6 @@ class DailyMindApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         DailySyncWorker.enqueue(this)
+        DailySyncWorker.enqueueImmediate(this)
     }
 }
