@@ -46,7 +46,7 @@ def main():
     if a.self_test:
         raise SystemExit(self_test())
     import psycopg2
-    conn = psycopg2.connect(host=os.environ.get("PGHOST", "192.168.80.153"), port=int(os.environ.get("PGPORT", "5432")),
+    conn = psycopg2.connect(host=os.environ.get("PGHOST", "192.168.80.155"), port=int(os.environ.get("PGPORT", "5432")),
         dbname=os.environ.get("PGDATABASE", "quote_garden"), user=os.environ.get("PGUSER", os.environ.get("SPRING_DATASOURCE_USERNAME", "postgres")),
         password=os.environ.get("PGPASSWORD", os.environ.get("SPRING_DATASOURCE_PASSWORD", "")))
     cache = load_cache()
