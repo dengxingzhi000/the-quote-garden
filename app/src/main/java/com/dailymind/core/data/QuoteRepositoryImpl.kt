@@ -1,7 +1,13 @@
 package com.dailymind.core.data
 
+import com.dailymind.core.database.dao.FavoriteDao
+import com.dailymind.core.database.dao.HistoryDao
 import com.dailymind.core.database.dao.QuoteDao
+import com.dailymind.core.database.entity.FavoriteEntity
+import com.dailymind.core.database.entity.HistoryEntity
 import com.dailymind.core.database.entity.QuoteEntity
+import com.dailymind.core.datastore.DailyQuoteStore
+import com.dailymind.core.datastore.todayEpochDay
 import com.dailymind.core.model.Quote
 import com.dailymind.core.network.ApiService
 import com.dailymind.core.network.dto.QuoteDto
@@ -11,27 +17,52 @@ import javax.inject.Inject
 
 class QuoteRepositoryImpl @Inject constructor(
     private val dao: QuoteDao,
-    private val api: ApiService
+    private val api: ApiService,
+    private val historyDao: HistoryDao,
+    private val dailyStore: DailyQuoteStore,
+    private val favorites: FavoriteDao
 ) : QuoteRepository {
     override fun observeQuotes(): Flow<List<Quote>> =
         dao.observeAll().map { list -> list.map { it.toModel() } }
 
-    override suspend fun getDailyQuote(): Quote? =
-        dao.getAll().firstOrNull()?.toModel()
+    override fun observeFavorites(): Flow<List<Quote>> =
+        favorites.observeFavorites().map { list -> list.map { it.toModel() } }
+
+    /**
+     * 每日一句：同一天钉选同一条（DataStore），新的一天从未看过的随机抽，
+     * 空库时回退网络，离线且空库返回 null（上层走 error/empty 状态）。
+     */
+    override suspend fun getDailyQuote(): Quote? {
+        val today = todayEpochDay()
+        dailyStore.getPinned()?.takeIf { it.day == today }?.let { pinned ->
+            dao.getById(pinned.quoteId)
+                ?.takeIf { it.deletedAt == null }
+                ?.toModel()
+                ?.let { return it }
+        }
+        val seen = historyDao.getAllQuoteIds().toSet()
+        var pick: QuoteEntity? = null
+        for (i in 0 until MAX_REROLL) {
+            val candidate = dao.getRandom() ?: break
+            pick = candidate
+            if (candidate.id !in seen) break
+        }
+        val entity = pick?.takeIf { it.deletedAt == null }
+            ?: dao.getAll().firstOrNull { it.deletedAt == null }
+            ?: return fetchNetworkDaily()
+        recordToday(entity.id)
+        return entity.toModel()
+    }
 
     override suspend fun getRandomQuote(): Quote =
-        (dao.getRandom() ?: QuoteEntity(
-            id = "fallback-1",
-            content = "The only way to do great work is to love what you do.",
-            translation = "成就伟大事业的唯一方法是热爱你的工作。",
-            author = "Steve Jobs",
-            category = "motivation",
-            difficulty = 1,
-            audioUrl = null,
-            imageUrl = null,
-            updatedAt = System.currentTimeMillis(),
-            deletedAt = null
-        )).toModel()
+        try {
+            val dto = api.getRandomQuote()
+            dao.upsertAll(listOf(dto.toEntity()))
+            dto.toModel()
+        } catch (e: Exception) {
+            dao.getRandom()?.toModel()
+                ?: throw IllegalStateException("No cached quote and network unavailable")
+        }
 
     override suspend fun sync(): Result<Unit> = runCatching {
         val max = dao.getMaxUpdatedAt() ?: 0L
@@ -44,9 +75,32 @@ class QuoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleFavorite(quoteId: String) {
-        // V1 stub: actual favorite join implemented in Task 8 extension
+        if (favorites.getIdsOnce().contains(quoteId)) {
+            favorites.deleteById(quoteId)
+        } else {
+            favorites.upsert(FavoriteEntity(quoteId, System.currentTimeMillis()))
+        }
+    }
+
+    private suspend fun fetchNetworkDaily(): Quote? = try {
+        val dto = api.getDailyQuote()
+        dao.upsertAll(listOf(dto.toEntity()))
+        recordToday(dto.id)
+        dto.toModel()
+    } catch (e: Exception) {
+        null
+    }
+
+    private suspend fun recordToday(quoteId: String) {
+        historyDao.insert(HistoryEntity(quoteId = quoteId, viewedAt = System.currentTimeMillis()))
+        dailyStore.setPinned(todayEpochDay(), quoteId)
     }
 
     private fun QuoteEntity.toModel() = Quote(id, content, translation, author, category, difficulty, audioUrl, imageUrl, updatedAt)
+    private fun QuoteDto.toModel() = Quote(id, content, translation, author, category, difficulty, audioUrl, imageUrl, updatedAt)
     private fun QuoteDto.toEntity() = QuoteEntity(id, content, translation, author, category, difficulty, audioUrl, imageUrl, updatedAt, deletedAt)
+
+    companion object {
+        private const val MAX_REROLL = 20
+    }
 }

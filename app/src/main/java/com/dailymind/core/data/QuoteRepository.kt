@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface QuoteRepository {
     fun observeQuotes(): Flow<List<Quote>>
+    fun observeFavorites(): Flow<List<Quote>>
     suspend fun getDailyQuote(): Quote?
     suspend fun getRandomQuote(): Quote
     suspend fun sync(): Result<Unit>
