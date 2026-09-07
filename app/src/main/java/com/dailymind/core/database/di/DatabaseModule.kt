@@ -1,13 +1,13 @@
 package com.dailymind.core.database.di
 
 import android.content.Context
-import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.dailymind.core.database.DailyMindDatabase
+import com.dailymind.core.database.dao.FavoriteDao
+import com.dailymind.core.database.dao.HistoryDao
 import com.dailymind.core.database.dao.QuoteDao
-import com.dailymind.core.database.entity.QuoteEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,4 +39,10 @@ object DatabaseModule {
 
     @Provides
     fun provideQuoteDao(db: DailyMindDatabase): QuoteDao = db.quoteDao()
+
+    @Provides
+    fun provideFavoriteDao(db: DailyMindDatabase): FavoriteDao = db.favoriteDao()
+
+    @Provides
+    fun provideHistoryDao(db: DailyMindDatabase): HistoryDao = db.historyDao()
 }
