@@ -91,7 +91,8 @@ def discover_categories(limit: int | None = None):
         if not m:
             continue
         slug = m.group(1)
-        if slug in ("search", "about", "contact", "index"):
+        if slug in ("search", "about", "contact", "index",
+                      "whats-new", "privacy-policy", "terms-and-conditions"):
             continue
         if slug not in slugs:
             slugs.append(slug)
