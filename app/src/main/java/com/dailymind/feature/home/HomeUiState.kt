@@ -5,7 +5,8 @@ import com.dailymind.core.model.Quote
 data class HomeUiState(
     val quote: Quote? = null,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isBrowsing: Boolean = false
 )
 
 sealed interface HomeEvent {

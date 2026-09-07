@@ -30,8 +30,12 @@ class HomeViewModel @Inject constructor(
                 }
             }
             is HomeEvent.NextRandom -> viewModelScope.launch {
-                val q = repo.getRandomQuote()
-                _uiState.value = _uiState.value.copy(quote = q)
+                try {
+                    val q = repo.getRandomQuote()
+                    _uiState.value = _uiState.value.copy(quote = q, error = null, isBrowsing = true)
+                } catch (e: Exception) {
+                    _uiState.value = _uiState.value.copy(error = e.message)
+                }
             }
             is HomeEvent.Favorite -> viewModelScope.launch { repo.toggleFavorite(event.id) }
         }

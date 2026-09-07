@@ -9,6 +9,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,9 +34,9 @@ import com.dailymind.core.designsystem.EditorialTopBar
 import com.dailymind.core.designsystem.OutlineTextAction
 import com.dailymind.core.designsystem.QuoteBlock
 import com.dailymind.core.designsystem.TextAction
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,8 +45,9 @@ fun HomeScreen(
     onNavigateToFavorite: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("MM / dd"))
-    val greeting = when (LocalTime.now().hour) {
+    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val date = "%02d / %02d".format(now.monthNumber, now.dayOfMonth)
+    val greeting = when (now.hour) {
         in 5..11 -> "Good Morning"
         in 12..17 -> "Good Afternoon"
         else -> "Good Evening"
@@ -60,8 +63,44 @@ fun HomeScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(64.dp))
-                EditorialTopBar(date = date, greeting = greeting)
+                AnimatedContent(
+                    targetState = state.isBrowsing,
+                    transitionSpec = {
+                        (fadeIn(tween(200)) togetherWith fadeOut(tween(200)))
+                    },
+                    label = "topBar"
+                ) { browsing ->
+                    if (browsing) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            TextAction(
+                                label = "Saved →",
+                                onClick = onNavigateToFavorite,
+                                modifier = Modifier.align(androidx.compose.ui.Alignment.CenterEnd)
+                            )
+                        }
+                    } else {
+                        EditorialTopBar(
+                            date = date,
+                            greeting = greeting,
+                            action = {
+                                TextAction(label = "Saved →", onClick = onNavigateToFavorite)
+                            }
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(48.dp))
+            }
+            item {
+                AnimatedVisibility(visible = state.quote != null && !state.isBrowsing) {
+                    Column {
+                        Text(
+                            text = "TODAY'S QUOTE",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
             }
             item {
                 AnimatedVisibility(visible = state.isLoading) {
@@ -77,55 +116,27 @@ fun HomeScreen(
                 AnimatedContent(
                     targetState = state.quote?.id ?: state.error ?: "empty",
                     transitionSpec = {
-                        (fadeIn(tween(200)) + slideInVertically(tween(200)) { it / 12 }) togetherWith
-                            (fadeOut(tween(200)) + slideOutVertically(tween(200)) { -it / 12 })
+                        (fadeIn(tween(200)) +
+                                slideInVertically(tween(200)) { it / 12 }) togetherWith
+                            (fadeOut(tween(200)) +
+                                    slideOutVertically(tween(200)) { -it / 12 })
                     },
                     label = "quoteContent"
-                ) { _ ->
+                ) { key ->
+                    val quote = state.quote
+                    val error = state.error
                     when {
-                        state.quote != null -> {
-                            val q = state.quote!!
-                            Text(
-                                text = "TODAY'S QUOTE",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            QuoteBlock(quote = q)
-                            Spacer(modifier = Modifier.height(32.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                TextAction(
-                                    label = "Next →",
-                                    onClick = { viewModel.onEvent(HomeEvent.NextRandom) },
-                                    modifier = Modifier.weight(1f)
-                                )
-                                OutlineTextAction(
-                                    label = "+ Favorite",
-                                    onClick = { viewModel.onEvent(HomeEvent.Favorite(q.id)) },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
+                        quote != null && key == quote.id -> {
+                            QuoteBlock(quote = quote)
                             Spacer(modifier = Modifier.height(24.dp))
-                            TextAction(label = "Saved →", onClick = onNavigateToFavorite)
-                            if (q.id.startsWith("fallback")) {
-                                Text(
-                                    text = "Local demo content · syncs when online",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(top = 16.dp)
-                                )
-                            }
                         }
-                        state.error != null -> {
+                        error != null && key == error -> {
                             EditorialError(
-                                message = state.error!!,
+                                message = error,
                                 onRetry = { viewModel.onEvent(HomeEvent.Load) }
                             )
                         }
-                        !state.isLoading -> {
+                        key == "empty" && !state.isLoading -> {
                             EditorialEmpty(
                                 title = "Nothing here yet",
                                 body = "Check your connection and try again.",
@@ -137,13 +148,38 @@ fun HomeScreen(
                 }
             }
             item {
-                Spacer(modifier = Modifier.height(48.dp))
-                Text(
-                    text = "Offline-first · cached first, syncs quietly",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
-                Spacer(modifier = Modifier.height(32.dp))
+                if (state.quote != null) {
+                    val q = state.quote!!
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        OutlineTextAction(
+                            label = "+ Favorite",
+                            onClick = { viewModel.onEvent(HomeEvent.Favorite(q.id)) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextAction(
+                            label = "Next →",
+                            onClick = { viewModel.onEvent(HomeEvent.NextRandom) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            item {
+                AnimatedVisibility(visible = !state.isBrowsing) {
+                    Column {
+                        Spacer(modifier = Modifier.height(48.dp))
+                        Text(
+                            text = "Offline-first · cached first, syncs quietly",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+                }
             }
         }
     }
