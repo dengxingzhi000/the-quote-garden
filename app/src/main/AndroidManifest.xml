@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <queries>
-        <provider android:authorities="com.google.android.gms.fonts">
-            <package android:name="com.google.android.gms" />
-        </provider>
+        <package android:name="com.google.android.gms" />
+        <provider android:authorities="com.google.android.gms.fonts" />
     </queries>
 
     <application
         android:name=".DailyMindApp"
         android:allowBackup="true"
-        android:icon="@android:mipmap/sym_def_app_icon"
-        android:label="DailyMind"
+        android:usesCleartextTraffic="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="The Quote Garden"
         android:theme="@android:style/Theme.Material.Light">
         <activity
             android:name=".MainActivity"
@@ -21,6 +25,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
     </application>
 
 </manifest>

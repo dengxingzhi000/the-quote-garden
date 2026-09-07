@@ -1,0 +1,21 @@
+# Signing keys (never commit)
+keystore/
+
+# Secrets
+local.properties
+*.properties.local
+
+# Build artifacts
+build/
+.gradle/
+app/build/
+server/build/
+server/.gradle/
+
+# IDE
+.idea/
+*.iml
+
+# Local-only tooling
+.opencode/
+tools/crawler/__pycache__/
