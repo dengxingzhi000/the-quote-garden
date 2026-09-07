@@ -68,6 +68,57 @@ def self_test() -> int:
     assert any("Chinese proverb" in (q["author"] or "") for q in quotes), quotes
     assert len(skipped) >= 1, "无~块应被跳过"
     print(f"self-test PASS: {len(quotes)} quotes, {len(skipped)} skipped")
+    return article_self_test()
+
+
+def parse_article_page(html: str, slug: str):
+    """整文模式：单篇 essay 页（blog-*）整体入库，段落保留空行分隔。"""
+    soup = BeautifulSoup(html, "lxml")
+    h1 = soup.find("h1")
+    title = normalize(h1.get_text()) if h1 else None
+    if not title and soup.title:
+        title = normalize(soup.title.get_text().split("|")[0])
+    body = soup.find("article") or soup.select_one("div.quotes-section")
+    if body is None:
+        return None
+    for c in body.find_all(string=lambda t: isinstance(t, Comment)):
+        c.extract()
+    paras = []
+    if body.find("p"):
+        from bs4 import NavigableString
+        for child in body.children:
+            if isinstance(child, NavigableString):
+                t = normalize(str(child))
+            else:
+                t = normalize(child.get_text(separator=" "))
+            if t:
+                paras.append(t)
+    else:
+        raw = body.get_text(separator="\n").replace(" ", " ")
+        paras = [t for t in (normalize(c) for c in re.split(r"\n\s*\n", raw)) if t]
+    content = "\n\n".join(paras)
+    if not title or len(content) < 100:
+        return None
+    url = f"{BASE}/{slug}.html"
+    return {"id": sha256_hex(url), "title": title, "source_url": url,
+            "content": content, "author": None, "category": slug}
+
+
+def article_self_test() -> int:
+    html = ("<html><head><title>Site | The Quote Garden</title></head><body>"
+            "<h1>Test Essay Title</h1><article><p>First paragraph here with enough words to pass.</p>"
+            "<p>Second paragraph with <i>italic</i> word and more content to be safe.</p></article></body></html>")
+    a = parse_article_page(html, "test-essay")
+    assert a is not None, "整文应解析出结果"
+    assert a["title"] == "Test Essay Title", a
+    assert "First paragraph here with enough" in a["content"] and "Second paragraph with italic word" in a["content"], a
+    assert "\n\n" in a["content"], "段落应保留空行分隔"
+    assert a["source_url"].endswith("/test-essay.html"), a
+    html2 = ("<html><head><title>Fallback Title | The Quote Garden</title></head><body>"
+             "<div class=\"quotes-section\">Long enough body text. " * 6 + "</div></body></html>")
+    b = parse_article_page(html2, "fallback-essay")
+    assert b is not None and b["title"] == "Fallback Title", b
+    print("article self-test PASS")
     return 0
 
 def fetch(url: str, retries: int = 3) -> str:
@@ -105,6 +156,23 @@ def load_progress():
         return set(json.loads(PROGRESS.read_text(encoding="utf-8")))
     return set()
 
+
+def discover_articles(limit: int | None = None):
+    """整文候选：首页链接中 blog- 开头的单篇页。"""
+    html = fetch(BASE + "/")
+    soup = BeautifulSoup(html, "lxml")
+    slugs = []
+    for a in soup.find_all("a", href=True):
+        m = re.fullmatch(r"/(blog-[a-z0-9\-]+)\.html", a["href"])
+        if not m:
+            continue
+        if m.group(1) not in slugs:
+            slugs.append(m.group(1))
+    return slugs[:limit] if limit else slugs
+    if PROGRESS.exists():
+        return set(json.loads(PROGRESS.read_text(encoding="utf-8")))
+    return set()
+
 def save_progress(done: set):
     PROGRESS.write_text(json.dumps(sorted(done), ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -114,9 +182,12 @@ def main():
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--no-db", action="store_true", help="只解析不入库")
+    ap.add_argument("--articles", action="store_true", help="整文模式：blog- 单篇页整体入库")
     args = ap.parse_args()
     if args.self_test:
         sys.exit(self_test())
+    if args.articles:
+        sys.exit(crawl_articles(args))
     slugs = discover_categories(args.limit if not args.all else None)
     done = load_progress()
     all_quotes, failed = [], []
@@ -139,11 +210,54 @@ def main():
     if not args.no_db and all_quotes:
         insert_db(all_quotes)
 
-def insert_db(quotes):
+def db_conn():
     import psycopg2
-    conn = psycopg2.connect(host=os.environ.get("PGHOST", "192.168.80.155"), port=int(os.environ.get("PGPORT", "5432")),
+    return psycopg2.connect(host=os.environ.get("PGHOST", "192.168.80.155"), port=int(os.environ.get("PGPORT", "5432")),
         dbname=os.environ.get("PGDATABASE", "quote_garden"), user=os.environ.get("PGUSER", os.environ.get("SPRING_DATASOURCE_USERNAME", "postgres")),
         password=os.environ.get("PGPASSWORD", os.environ.get("SPRING_DATASOURCE_PASSWORD", "")))
+
+
+def crawl_articles(args) -> int:
+    slugs = discover_articles(args.limit)
+    progress_file = ROOT / "articles_progress.json"
+    done = set(json.loads(progress_file.read_text(encoding="utf-8"))) if progress_file.exists() else set()
+    all_articles, failed = [], []
+    for slug in slugs:
+        if slug in done:
+            continue
+        try:
+            html = fetch(f"{BASE}/{slug}.html")
+            a = parse_article_page(html, slug)
+            if a is None:
+                failed.append(f"{slug} parse-empty")
+            else:
+                all_articles.append(a)
+            done.add(slug)
+            progress_file.write_text(json.dumps(sorted(done), ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            failed.append(f"{slug} {e}")
+        time.sleep(1.0 + random.random() * 0.5)
+    (ROOT / "articles.jsonl").open("a", encoding="utf-8").write("".join(json.dumps(a, ensure_ascii=False) + "\n" for a in all_articles))
+    print(f"crawled {len(all_articles)} articles, {len(failed)} failed")
+    if not args.no_db and all_articles:
+        insert_articles(all_articles)
+    return 0 if not failed else 1
+
+
+def insert_articles(articles):
+    conn = db_conn()
+    import time as _t
+    now = int(_t.time() * 1000)
+    with conn, conn.cursor() as cur:
+        for a in articles:
+            cur.execute("INSERT INTO article(id, title, source_url, content, author, category, updated_at) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(id) DO NOTHING",
+                (a["id"], a["title"], a["source_url"], a["content"], a["author"], a["category"], now))
+    conn.close()
+    print(f"inserted {len(articles)} articles (dedup by id)")
+
+
+def insert_db(quotes):
+    conn = db_conn()
     import time as _t
     now = int(_t.time() * 1000)
     with conn, conn.cursor() as cur:

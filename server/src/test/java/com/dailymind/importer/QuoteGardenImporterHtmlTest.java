@@ -17,8 +17,7 @@ public class QuoteGardenImporterHtmlTest {
         int n2 = importer.importHtml("<div class=\"quotes-section\">Whenever you are sincerely pleased, you are nourished. ~Ralph Waldo Emerson, 1860<BR><BR><BR></div>", "happiness");
         assertThat(n2).isEqualTo(0); // 去重
     }
-    @Test void routesLongContentToArticleTable() {
-        FakeRepo repo = new FakeRepo(Set.of());
+    @Test void routesLongContentToArticleTable() {        FakeRepo repo = new FakeRepo(Set.of());
         FakeArticleRepo articles = new FakeArticleRepo();
         var importer = new QuoteGardenImporter(repo, new Normalizer(), new QuoteGardenHtmlParser(), articles);
         String longContent = "Lorem ipsum dolor sit amet. ".repeat(40);
@@ -26,6 +25,20 @@ public class QuoteGardenImporterHtmlTest {
         assertThat(n).isEqualTo(1);
         assertThat(repo.count()).isEqualTo(0);
         assertThat(articles.count()).isEqualTo(1);
+    }
+    @Test void importsArticlePageAsWhole() {
+        FakeRepo repo = new FakeRepo(Set.of());
+        FakeArticleRepo articles = new FakeArticleRepo();
+        var importer = new QuoteGardenImporter(repo, new Normalizer(), new QuoteGardenHtmlParser(), articles);
+        String html = "<html><head><title>Site</title></head><body><h1>Essay Title</h1>"
+            + "<article><p>Para one with enough words to be valid content here.</p>"
+            + "<p>Para two with more words to be safe and sound.</p></article></body></html>";
+        int n = importer.importArticlePage(html, "blog-test", "https://www.quotegarden.com/blog-test.html");
+        assertThat(n).isEqualTo(1);
+        assertThat(repo.count()).isEqualTo(0);
+        assertThat(articles.count()).isEqualTo(1);
+        int n2 = importer.importArticlePage(html, "blog-test", "https://www.quotegarden.com/blog-test.html");
+        assertThat(n2).isEqualTo(0);
     }
     static class FakeRepo implements QuoteRepository {
         private final Set<String> ids; private final Map<String, Quote> store = new HashMap<>();

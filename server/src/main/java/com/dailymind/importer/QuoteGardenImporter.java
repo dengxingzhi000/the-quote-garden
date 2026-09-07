@@ -3,6 +3,11 @@ import com.dailymind.article.domain.Article;
 import com.dailymind.article.infrastructure.ArticleRepository;
 import com.dailymind.quote.domain.Quote;
 import com.dailymind.quote.infrastructure.QuoteRepository;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.*;
@@ -39,6 +44,45 @@ public class QuoteGardenImporter {
             }
         }
         return count;
+    }
+    /** 整文导入：单篇 essay 页整体存入 article（标题 + 来源链接），段落保留空行分隔. */
+    public int importArticlePage(String html, String category, String url) {
+        var doc = Jsoup.parse(html);
+        var h1 = doc.selectFirst("h1");
+        String title = h1 != null ? h1.text().strip() : null;
+        if ((title == null || title.isBlank()) && doc.title() != null) {
+            title = doc.title().split("\\|")[0].strip();
+        }
+        var body = doc.selectFirst("article");
+        if (body == null) body = doc.selectFirst("div.quotes-section");
+        if (body == null || title == null || title.isBlank()) return 0;
+        List<String> paras = new ArrayList<>();
+        if (!body.select("p").isEmpty()) {
+            for (Node child : new ArrayList<>(body.childNodes())) {
+                if (child instanceof Comment) continue;
+                String t;
+                if (child instanceof TextNode tn) t = tn.text();
+                else if (child instanceof Element el) t = el.text();
+                else continue;
+                t = t.strip().replaceAll("\\s+", " ");
+                if (!t.isEmpty()) paras.add(t);
+            }
+        } else {
+            for (String chunk : body.wholeText().split("\\n\\s*\\n")) {
+                String t = chunk.strip().replaceAll("\\s+", " ");
+                if (!t.isEmpty()) paras.add(t);
+            }
+        }
+        String content = String.join("\n\n", paras);
+        if (content.length() < 100) return 0;
+        String hash = normalizer.hash(url);
+        if (articles.existsById(hash)) return 0;
+        Article a = new Article();
+        a.id = hash; a.title = title; a.sourceUrl = url;
+        a.content = content; a.category = category;
+        a.updatedAt = System.currentTimeMillis();
+        articles.save(a);
+        return 1;
     }
     /** 旧JSON API路径保留兼容，标记废弃. */
     @Deprecated
