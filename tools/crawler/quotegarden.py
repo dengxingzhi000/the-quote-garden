@@ -9,6 +9,8 @@ BASE = "https://www.quotegarden.com"
 UA = {"User-Agent": "DailyMindSeed/1.0"}
 ROOT = Path(__file__).parent
 PROGRESS = ROOT / "progress.json"
+# 名言与文章的长度分界（字符数），与服务端 V2 迁移及 QuoteGardenImporter 保持一致
+ARTICLE_THRESHOLD = 800
 
 def normalize(raw: str | None):
     if raw is None:
@@ -145,11 +147,17 @@ def insert_db(quotes):
     import time as _t
     now = int(_t.time() * 1000)
     with conn, conn.cursor() as cur:
+        nq = na = 0
         for q in quotes:
-            cur.execute("INSERT INTO quote(id, content, author, category, updated_at) VALUES (%s,%s,%s,%s,%s) ON CONFLICT(id) DO NOTHING",
+            table = "article" if len(q["content"]) >= ARTICLE_THRESHOLD else "quote"
+            cur.execute(f"INSERT INTO {table}(id, content, author, category, updated_at) VALUES (%s,%s,%s,%s,%s) ON CONFLICT(id) DO NOTHING",
                 (q["id"], q["content"], q["author"], q["category"], now))
+            if table == "article":
+                na += 1
+            else:
+                nq += 1
     conn.close()
-    print(f"inserted {len(quotes)} (dedup by id)")
+    print(f"inserted {nq} quotes + {na} articles (dedup by id)")
 
 if __name__ == "__main__":
     main()

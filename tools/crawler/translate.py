@@ -50,19 +50,24 @@ def main():
         dbname=os.environ.get("PGDATABASE", "quote_garden"), user=os.environ.get("PGUSER", os.environ.get("SPRING_DATASOURCE_USERNAME", "postgres")),
         password=os.environ.get("PGPASSWORD", os.environ.get("SPRING_DATASOURCE_PASSWORD", "")))
     cache = load_cache()
+    total_n = total_rows = 0
     with conn, conn.cursor() as cur:
-        cur.execute("SELECT id, content FROM quote WHERE translation IS NULL ORDER BY updated_at DESC LIMIT %s OFFSET %s", (a.limit, a.offset))
-        rows = cur.fetchall()
-        n = 0
-        for qid, content in rows:
-            t = translate_one(content, cache)
-            if t:
-                cur.execute("UPDATE quote SET translation=%s WHERE id=%s", (t, qid))
-                n += 1
-            time.sleep(1.0)
+        for table in ("quote", "article"):
+            cur.execute(f"SELECT id, content FROM {table} WHERE translation IS NULL ORDER BY updated_at DESC LIMIT %s OFFSET %s", (a.limit, a.offset))
+            rows = cur.fetchall()
+            n = 0
+            for qid, content in rows:
+                t = translate_one(content, cache)
+                if t:
+                    cur.execute(f"UPDATE {table} SET translation=%s WHERE id=%s", (t, qid))
+                    n += 1
+                time.sleep(1.0)
+            print(f"translated {n}/{len(rows)} in {table}")
+            total_n += n
+            total_rows += len(rows)
     save_cache(cache)
     conn.close()
-    print(f"translated {n}/{len(rows)}")
+    print(f"translated {total_n}/{total_rows} total")
 
 if __name__ == "__main__":
     main()

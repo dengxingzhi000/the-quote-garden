@@ -1,4 +1,6 @@
 package com.dailymind.importer;
+import com.dailymind.article.domain.Article;
+import com.dailymind.article.infrastructure.ArticleRepository;
 import com.dailymind.quote.domain.Quote;
 import com.dailymind.quote.infrastructure.QuoteRepository;
 import org.springframework.stereotype.Component;
@@ -6,24 +8,35 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 @Component
 public class QuoteGardenImporter {
+    /** 名言与文章的长度分界（字符数），与 V2 迁移及 Python 爬虫保持一致. */
+    public static final int ARTICLE_THRESHOLD = 800;
     private final QuoteRepository repo;
     private final Normalizer normalizer;
     private final QuoteGardenHtmlParser parser;
-    public QuoteGardenImporter(QuoteRepository repo, Normalizer normalizer, QuoteGardenHtmlParser parser) {
-        this.repo = repo; this.normalizer = normalizer; this.parser = parser;
+    private final ArticleRepository articles;
+    public QuoteGardenImporter(QuoteRepository repo, Normalizer normalizer, QuoteGardenHtmlParser parser, ArticleRepository articles) {
+        this.repo = repo; this.normalizer = normalizer; this.parser = parser; this.articles = articles;
     }
-    /** HTML分类页导入（新主路径）：幂等，去重后返回新增数. */
+    /** HTML分类页导入（新主路径）：幂等，长文路由到 article 表，去重后返回新增数. */
     public int importHtml(String html, String category) {
         int count = 0;
         for (ParsedQuote p : parser.parse(html, category)) {
             String content = normalizer.normalize(p.content());
             if (content == null || content.isBlank()) continue;
             String hash = normalizer.hash(content);
-            if (repo.existsById(hash)) continue;
-            Quote q = new Quote();
-            q.id = hash; q.content = content; q.author = p.author(); q.category = p.category();
-            q.updatedAt = System.currentTimeMillis();
-            repo.save(q); count++;
+            if (content.length() >= ARTICLE_THRESHOLD) {
+                if (articles.existsById(hash)) continue;
+                Article a = new Article();
+                a.id = hash; a.content = content; a.author = p.author(); a.category = p.category();
+                a.updatedAt = System.currentTimeMillis();
+                articles.save(a); count++;
+            } else {
+                if (repo.existsById(hash)) continue;
+                Quote q = new Quote();
+                q.id = hash; q.content = content; q.author = p.author(); q.category = p.category();
+                q.updatedAt = System.currentTimeMillis();
+                repo.save(q); count++;
+            }
         }
         return count;
     }
