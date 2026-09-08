@@ -1,0 +1,32 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Point Render at this file when creating a new "Blueprint" service. Render
+# will spin up the Web Service automatically. The Postgres is omitted on
+# purpose: the project pairs best with **Neon free tier** (no time bomb).
+# Drop the Neon JDBC URL/username/password into the environment section
+# below before applying the blueprint, or set them on the Render dashboard
+# after the first deploy.
+
+services:
+  - type: web
+    name: dailymind-server
+    runtime: docker
+    rootDir: server
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: SERVER_PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        sync: false   # paste the Neon JDBC URL after first deploy
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JAVA_OPTS
+        value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75"
