@@ -2,10 +2,14 @@
 
 package com.dailymind.core.designsystem
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,14 +18,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -117,18 +124,45 @@ fun TextAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier
 }
 
 @Composable
-fun OutlineTextAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun OutlineTextAction(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isOn: Boolean = false,
+    pulseKey: Any = Unit,
+) {
+    val border = if (isOn) BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                 else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    val pulse = remember { Animatable(0f) }
+    LaunchedEffect(pulseKey) {
+        if (pulseKey != Unit) {
+            pulse.animateTo(1f, tween(200))
+            pulse.animateTo(0f, tween(200))
+        }
+    }
     TextButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = 48.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp)
+        border = border,
+        shape = RoundedCornerShape(0.dp)
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(1.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .alpha(pulse.value)
+            )
+        }
     }
 }
 
