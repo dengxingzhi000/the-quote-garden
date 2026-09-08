@@ -55,6 +55,30 @@ core/
 - `CategoryPreferenceStore` is injected into `HomeViewModel` via Hilt (the constructor of `HomeViewModel` gains one parameter).
 - `BrowseViewModel` and `CategoryDetailViewModel` only need `QuoteRepository`.
 
+### 3.2 Design system layering
+
+DailyMind uses a two-layer design system. The spec follows this convention:
+
+```
+Material 3 (foundation)          Editorial (visual layer)
+─────────────────────            ──────────────────────────
+Color System       ──used by──▶  EditorialTopBar, IndexRow, QuoteBlock
+Typography         ──used by──▶  Display/Headline/Body text-only composition
+Accessibility / DP ──used by──▶  48dp touch targets, 40dp+ chip heights
+Dark mode / tokens ──used by──▶  Quiet-luxury dark scheme, accent restraint
+Bottom Navigation  ──adapted─▶  EditorialBottomBar (3-tab text bar, see §5.1)
+ModalBottomSheet   ──used by──▶  "More…" category picker (§5.2)
+```
+
+New UI in this spec must **not** introduce Material 3 chrome (FilledButton, OutlinedChip, Card with elevation, AppBar, etc.) unless the spec explicitly motivates the exception. Instead, compose text and dividers with the editorial palette, mirroring the existing Home, Me, and QuoteBlock components.
+
+**Concrete consequences for this spec:**
+
+- Category chips are **not** Material 3 `AssistChip` / `FilterChip`. They are a 40dp+ tall `Text` button with a 1dp underline in `colorScheme.primary` when selected, no background. (Already in §5.2.)
+- Browse category tiles are **not** Material 3 `Card` or `ElevatedCard`. They are 1:1 `Box` with a 1dp `outlineVariant` border, text-only contents, and a numbered `#01` label as the only "decoration".
+- The Browse "More…" picker uses `ModalBottomSheet` for its platform-correct swipe-to-dismiss behavior, but its contents are a plain text list (no chips, no dividers between items except a single trailing rule).
+- The Browse top bar reuses the existing `EditorialTopBar(date, "By mood")` — the greeting string is the only difference from Home.
+
 ## 4. Data Layer
 
 ### 4.1 `QuoteDao` — new queries
