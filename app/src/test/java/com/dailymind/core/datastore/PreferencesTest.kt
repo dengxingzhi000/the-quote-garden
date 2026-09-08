@@ -12,4 +12,8 @@ class PreferencesTest {
         assertNotNull(PreferencesKeys.DAILY_QUOTE_DATE)
         assertNotNull(PreferencesKeys.DAILY_QUOTE_ID)
     }
+
+    @Test fun `category preference key exists`() {
+        assertNotNull(PreferencesKeys.CATEGORY)
+    }
 }

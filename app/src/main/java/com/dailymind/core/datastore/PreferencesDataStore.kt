@@ -17,6 +17,7 @@ object PreferencesKeys {
     val THEME = stringPreferencesKey("theme")
     val DAILY_QUOTE_DATE = longPreferencesKey("daily_quote_date")
     val DAILY_QUOTE_ID = stringPreferencesKey("daily_quote_id")
+    val CATEGORY = stringPreferencesKey("selected_category")
 }
 
 data class PinnedDaily(val day: Long, val quoteId: String)
