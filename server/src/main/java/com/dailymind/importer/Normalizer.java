@@ -2,7 +2,9 @@ package com.dailymind.importer;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Normalizer {
     public String normalize(String raw) {
         return raw == null ? null : raw.trim().replaceAll("\\s+", " ");
