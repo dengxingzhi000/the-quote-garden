@@ -10,14 +10,21 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import com.dailymind.core.designsystem.BottomTab
 import com.dailymind.core.designsystem.EditorialBottomBar
+import com.dailymind.feature.browse.BrowseScreen
+import com.dailymind.feature.browse.CategoryDetailScreen
 import com.dailymind.feature.home.HomeScreen
 import com.dailymind.feature.me.MeScreen
 
-private val Tabs = listOf(BottomTab("home", "Today"), BottomTab("me", "Me"))
+private val Tabs = listOf(
+    BottomTab("home", "Today"),
+    BottomTab("browse", "Browse"),
+    BottomTab("me", "Me"),
+)
 
 private fun Route.tabId(): String = when (this) {
     is Route.Home -> "home"
     is Route.Me -> "me"
+    is Route.Browse, is Route.CategoryDetail -> "browse"
     else -> "home"
 }
 
@@ -36,6 +43,15 @@ fun AppNavDisplay() {
                 when (route) {
                     is Route.Home -> NavEntry(route) { HomeScreen() }
                     is Route.Me -> NavEntry(route) { MeScreen(onExplore = { select(Route.Home) }) }
+                    is Route.Browse -> NavEntry(route) {
+                        BrowseScreen(onSelectCategory = { backStack.add(Route.CategoryDetail(it)) })
+                    }
+                    is Route.CategoryDetail -> NavEntry(route) {
+                        CategoryDetailScreen(
+                            category = route.category,
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
                     else -> NavEntry(route) { }
                 }
             },
@@ -44,7 +60,15 @@ fun AppNavDisplay() {
         EditorialBottomBar(
             tabs = Tabs,
             selectedId = backStack.lastOrNull()?.tabId() ?: "home",
-            onSelect = { id -> select(if (id == "me") Route.Me else Route.Home) }
+            onSelect = { id ->
+                select(
+                    when (id) {
+                        "me" -> Route.Me
+                        "browse" -> Route.Browse
+                        else -> Route.Home
+                    }
+                )
+            }
         )
     }
 }
