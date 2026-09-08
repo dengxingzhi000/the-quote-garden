@@ -44,7 +44,10 @@ fun AppNavDisplay() {
                     is Route.Home -> NavEntry(route) { HomeScreen() }
                     is Route.Me -> NavEntry(route) { MeScreen(onExplore = { select(Route.Home) }) }
                     is Route.Browse -> NavEntry(route) {
-                        BrowseScreen(onSelectCategory = { backStack.add(Route.CategoryDetail(it)) })
+                        BrowseScreen(
+                            onSelectCategory = { backStack.add(Route.CategoryDetail(it)) },
+                            onGoHome = { select(Route.Home) }
+                        )
                     }
                     is Route.CategoryDetail -> NavEntry(route) {
                         CategoryDetailScreen(

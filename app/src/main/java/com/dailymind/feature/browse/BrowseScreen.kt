@@ -35,6 +35,7 @@ import com.dailymind.core.designsystem.EditorialTopBar
 fun BrowseScreen(
     viewModel: BrowseViewModel = hiltViewModel(),
     onSelectCategory: (String) -> Unit = {},
+    onGoHome: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
@@ -61,7 +62,7 @@ fun BrowseScreen(
                     title = "Nothing to browse yet",
                     body = "Pull to sync on Home.",
                     actionLabel = "Go to Home",
-                    onAction = { onSelectCategory("") /* parent decides */ }
+                    onAction = onGoHome
                 )
             } else {
                 LazyVerticalGrid(
