@@ -8,7 +8,7 @@ class RouteTest {
         assertNotEquals(Route.Home, Route.Me)
         assertNotEquals(Route.Home, Route.Browse)
         assertNotEquals(Route.Me, Route.Browse)
-        assertNotEquals(Route.Browse as Route, Route.CategoryDetail("love") as Route)
+        assertNotEquals(Route.Browse, Route.CategoryDetail("love"))
     }
 
     @Test fun `CategoryDetail carries the category string`() {
