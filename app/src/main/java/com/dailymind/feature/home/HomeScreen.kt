@@ -156,8 +156,10 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         OutlineTextAction(
-                            label = "+ Favorite",
+                            label = if (state.isCurrentQuoteFavorite) "Saved ✓" else "+ Save",
                             onClick = { viewModel.onEvent(HomeEvent.Favorite(q.id)) },
+                            isOn = state.isCurrentQuoteFavorite,
+                            pulseKey = state.favoriteTapKey,
                             modifier = Modifier.weight(1f)
                         )
                         TextAction(
