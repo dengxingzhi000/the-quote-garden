@@ -20,6 +20,9 @@ interface QuoteDao {
     @Query("SELECT * FROM quote WHERE deletedAt IS NULL ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandom(): QuoteEntity?
 
+    @Query("SELECT * FROM quote WHERE deletedAt IS NULL AND id != :excludeId ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomExcluding(excludeId: String): QuoteEntity?
+
     @Upsert
     suspend fun upsertAll(entities: List<QuoteEntity>)
 
