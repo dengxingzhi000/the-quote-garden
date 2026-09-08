@@ -26,11 +26,14 @@ object NetworkModule {
     @Singleton
     fun provideOkHttp(): OkHttpClient = OkHttpClient.Builder().build()
 
+    /** 后端地址：本机 localhost 供同 WiFi 真机访问（WLAN IP）。模拟器改用 http://10.0.2.2:8080/ */
+    private const val BASE_URL = "http://192.168.0.79:8080/"
+
     @Provides
     @Singleton
     fun provideRetrofit(json: Json, client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl("https://api.dailymind.local/")
+            .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
