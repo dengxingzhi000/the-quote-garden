@@ -3,6 +3,7 @@ package com.dailymind.feature.favorite
 import com.dailymind.MainDispatcherRule
 import com.dailymind.core.data.QuoteRepository
 import com.dailymind.core.model.Quote
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
@@ -22,5 +23,13 @@ class FavoriteViewModelTest {
         )
         val vm = FavoriteViewModel(repo)
         assertEquals("Hello", vm.favorites.first { it.isNotEmpty() }[0].content)
+    }
+
+    @Test fun `Unfavorite calls repo toggleFavorite`() = runTest {
+        val repo = mockk<QuoteRepository>(relaxed = true)
+        every { repo.observeFavorites() } returns flowOf(emptyList())
+        val vm = FavoriteViewModel(repo)
+        vm.onEvent(FavoriteEvent.Unfavorite("42"))
+        coVerify { repo.toggleFavorite("42") }
     }
 }
