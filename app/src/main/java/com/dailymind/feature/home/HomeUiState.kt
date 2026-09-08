@@ -6,7 +6,9 @@ data class HomeUiState(
     val quote: Quote? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isBrowsing: Boolean = false
+    val isBrowsing: Boolean = false,
+    val isCurrentQuoteFavorite: Boolean = false,
+    val favoriteTapKey: Int = 0,
 )
 
 sealed interface HomeEvent {
