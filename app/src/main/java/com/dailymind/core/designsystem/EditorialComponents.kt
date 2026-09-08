@@ -1,8 +1,11 @@
+@file:Suppress("FunctionName")
+
 package com.dailymind.core.designsystem
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,13 +29,25 @@ import androidx.compose.ui.unit.dp
 import com.dailymind.core.model.Quote
 
 @Composable
-fun EditorialTopBar(date: String, greeting: String, modifier: Modifier = Modifier) {
+fun EditorialTopBar(
+    date: String,
+    greeting: String,
+    modifier: Modifier = Modifier,
+    action: (@Composable () -> Unit)? = null
+) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = date,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = date,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            action?.invoke()
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = greeting,

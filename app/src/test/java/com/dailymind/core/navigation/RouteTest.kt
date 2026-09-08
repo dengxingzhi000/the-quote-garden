@@ -5,6 +5,6 @@ import org.junit.Test
 
 class RouteTest {
     @Test fun `routes are distinct`() {
-        assertNotEquals<Route>(Route.Home, Route.Favorite)
+        assertNotEquals(Route.Home, Route.Favorite)
     }
 }

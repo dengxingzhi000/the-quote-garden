@@ -15,6 +15,13 @@ okhttp = "4.12.0"
 converter = "1.0.0"
 serialization = "1.8.1"
 navigation3 = "1.0.0"
+kotlinx-datetime = "0.6.1"
+junit = "4.13.2"
+mockk = "1.13.13"
+coroutines = "1.9.0"
+androidx-test-core = "1.6.1"
+androidx-test-ext = "1.2.1"
+room-testing = "2.8.4"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -37,7 +44,16 @@ retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.r
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 retrofit-kotlinx-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "converter" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 desugaring = { group = "com.android.tools", name = "desugar_jdk_libs", version = "2.1.4" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidx-test-core" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidx-test-ext" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room-testing" }
+okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
