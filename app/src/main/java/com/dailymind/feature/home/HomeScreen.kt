@@ -85,7 +85,7 @@ fun HomeScreen(
                         Text(
                             text = "TODAY'S QUOTE",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
