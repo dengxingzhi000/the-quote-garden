@@ -1,5 +1,6 @@
 package com.dailymind.core.data
 
+import com.dailymind.core.database.CategoryCount
 import com.dailymind.core.database.dao.FavoriteDao
 import com.dailymind.core.database.dao.HistoryDao
 import com.dailymind.core.database.dao.QuoteDao
@@ -28,11 +29,10 @@ class QuoteRepositoryImpl @Inject constructor(
     override fun observeFavorites(): Flow<List<Quote>> =
         favorites.observeFavorites().map { list -> list.map { it.toModel() } }
 
-    /**
-     * 每日一句：同一天钉选同一条（DataStore），新的一天从未看过的随机抽，
-     * 空库时回退网络，离线且空库返回 null（上层走 error/empty 状态）。
-     */
-    override suspend fun getDailyQuote(): Quote? {
+    override suspend fun getDailyQuote(category: String?): Quote? {
+        if (category != null) {
+            return dao.getRandomFiltered(category)?.toModel()
+        }
         val today = todayEpochDay()
         dailyStore.getPinned()?.takeIf { it.day == today }?.let { pinned ->
             dao.getById(pinned.quoteId)
@@ -54,9 +54,9 @@ class QuoteRepositoryImpl @Inject constructor(
         return entity.toModel()
     }
 
-    override suspend fun getLocalRandomQuote(excludeId: String?): Quote? =
-        if (excludeId == null) dao.getRandom()?.toModel()
-        else dao.getRandomExcluding(excludeId)?.toModel()
+    override suspend fun getLocalRandomQuote(excludeId: String?, category: String?): Quote? =
+        if (excludeId == null) dao.getRandomFiltered(category)?.toModel()
+        else dao.getRandomExcludingFiltered(excludeId, category)?.toModel()
 
     override fun observeFavoriteIds(): Flow<Set<String>> =
         favorites.observeFavorites().map { list -> list.map { it.id }.toSet() }
@@ -88,6 +88,13 @@ class QuoteRepositoryImpl @Inject constructor(
             favorites.upsert(FavoriteEntity(quoteId, System.currentTimeMillis()))
         }
     }
+
+    override fun observeCategories(): Flow<List<String>> = dao.observeCategories()
+
+    override fun observeCategoryCounts(): Flow<List<CategoryCount>> = dao.observeCategoryCounts()
+
+    override fun observeQuotesByCategory(category: String): Flow<List<Quote>> =
+        dao.observeByCategory(category).map { list -> list.map { it.toModel() } }
 
     private suspend fun fetchNetworkDaily(): Quote? = try {
         val dto = api.getDailyQuote()

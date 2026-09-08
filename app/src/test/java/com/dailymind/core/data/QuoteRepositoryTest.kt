@@ -131,24 +131,24 @@ class QuoteRepositoryTest {
     @Test fun `getLocalRandomQuote excludes specified id`() = runTest {
         val dao = mockk<QuoteDao>()
         val q2 = QuoteEntity("2", "B", "乙", "Y", "c", 1, null, null, 2L, null)
-        coEvery { dao.getRandomExcluding("1") } returns q2
+        coEvery { dao.getRandomExcludingFiltered("1", null) } returns q2
         val q = repo(dao = dao).getLocalRandomQuote(excludeId = "1")!!
         assertEquals("2", q.id)
-        coVerify { dao.getRandomExcluding("1") }
+        coVerify { dao.getRandomExcludingFiltered("1", null) }
     }
 
     @Test fun `getLocalRandomQuote returns null on empty db`() = runTest {
         val dao = mockk<QuoteDao>()
-        coEvery { dao.getRandomExcluding("any") } returns null
+        coEvery { dao.getRandomExcludingFiltered("any", null) } returns null
         assertNull(repo(dao = dao).getLocalRandomQuote(excludeId = "any"))
     }
 
     @Test fun `getLocalRandomQuote calls getRandom when excludeId null`() = runTest {
         val dao = mockk<QuoteDao>()
-        coEvery { dao.getRandom() } returns entity
+        coEvery { dao.getRandomFiltered(null) } returns entity
         val q = repo(dao = dao).getLocalRandomQuote(excludeId = null)!!
         assertEquals("9", q.id)
-        coVerify(exactly = 0) { dao.getRandomExcluding(any()) }
+        coVerify(exactly = 0) { dao.getRandomExcludingFiltered(any(), any()) }
     }
 
     @Test fun `observeFavoriteIds emits id set from favorites flow`() = runTest {
