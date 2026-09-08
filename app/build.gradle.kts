@@ -53,6 +53,12 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
 }
 kotlin {
     jvmToolchain(21)
@@ -87,6 +93,14 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.room.testing)
+
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     androidTestImplementation(platform(bom))
     androidTestImplementation(libs.androidx.test.core)
