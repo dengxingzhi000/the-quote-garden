@@ -8,21 +8,33 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -80,6 +92,15 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(48.dp))
             }
             item {
+                CategoryChips(
+                    selected = state.selectedCategory,
+                    available = state.availableCategories,
+                    onPick = { viewModel.onEvent(HomeEvent.SelectCategory(it)) },
+                    onMore = { /* future: show full sheet */ }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            item {
                 AnimatedVisibility(visible = state.quote != null && !state.isBrowsing) {
                     Column {
                         Text(
@@ -126,12 +147,20 @@ fun HomeScreen(
                             )
                         }
                         key == "empty" && !state.isLoading -> {
-                            EditorialEmpty(
-                                title = "Nothing here yet",
-                                body = "Check your connection and try again.",
-                                actionLabel = "Retry →",
-                                onAction = { viewModel.onEvent(HomeEvent.Load) }
-                            )
+                            when (state.emptyMode) {
+                                EmptyMode.NoCategoryLines -> EditorialEmpty(
+                                    title = "No lines in this category yet",
+                                    body = "This category hasn't been synced to your device.",
+                                    actionLabel = "Switch to All",
+                                    onAction = { viewModel.onEvent(HomeEvent.SelectCategory(null)) }
+                                )
+                                EmptyMode.Generic -> EditorialEmpty(
+                                    title = "Nothing here yet",
+                                    body = "Check your connection and try again.",
+                                    actionLabel = "Retry →",
+                                    onAction = { viewModel.onEvent(HomeEvent.Load) }
+                                )
+                            }
                         }
                     }
                 }
@@ -172,6 +201,84 @@ fun HomeScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryChips(
+    selected: String?,
+    available: List<String>,
+    onPick: (String?) -> Unit,
+    onMore: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+) {
+    var sheetVisible by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            ChipLabel(text = "All", isSelected = selected == null, onClick = { onPick(null) })
+        }
+        items(available) { cat ->
+            ChipLabel(text = cat, isSelected = selected == cat, onClick = { onPick(cat) })
+        }
+        if (available.size > 6 && onMore != null) {
+            item {
+                ChipLabel(text = "More\u2026", isSelected = false, onClick = { sheetVisible = true })
+            }
+        }
+    }
+    if (sheetVisible) {
+        ModalBottomSheet(onDismissRequest = { sheetVisible = false }, sheetState = sheetState) {
+            Column(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
+                available.forEach { cat ->
+                    Text(
+                        text = cat,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .clickable {
+                                onPick(cat)
+                                sheetVisible = false
+                            }
+                            .padding(vertical = 12.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChipLabel(text: String, isSelected: Boolean, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .heightIn(min = 40.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (isSelected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (isSelected) {
+            Spacer(modifier = Modifier.height(2.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(1.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
         }
     }
 }
