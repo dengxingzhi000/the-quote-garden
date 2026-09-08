@@ -1,26 +1,17 @@
 package com.dailymind.feature.browse
 
+import com.dailymind.MainDispatcherRule
 import com.dailymind.core.data.QuoteRepository
 import com.dailymind.core.database.CategoryCount
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class BrowseViewModelTest {
-    private val dispatcher = UnconfinedTestDispatcher()
-
-    @Before fun setUp() { Dispatchers.setMain(dispatcher) }
-    @After fun tearDown() { Dispatchers.resetMain() }
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Test fun `empty counts produces empty state with loading off`() {
         val counts = MutableStateFlow<List<CategoryCount>>(emptyList())
