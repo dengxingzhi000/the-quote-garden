@@ -69,7 +69,8 @@ fun FavoriteScreen(
                         number = (index + 1).toString().padStart(2, '0'),
                         content = q.content,
                         author = q.author,
-                        onClick = {}
+                        onClick = {},
+                        onSwipeOut = { vm.onEvent(FavoriteEvent.Unfavorite(q.id)) },
                     )
                 }
             }
