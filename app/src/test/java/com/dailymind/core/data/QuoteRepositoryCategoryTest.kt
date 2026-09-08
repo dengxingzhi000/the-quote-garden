@@ -20,7 +20,6 @@ import org.junit.Test
 
 class QuoteRepositoryCategoryTest {
     private val entity = QuoteEntity("9", "c", "t", "a", "love", 1, null, null, 1L, null)
-    private val entity2 = QuoteEntity("10", "c2", "t", "a", "life", 1, null, null, 1L, null)
 
     private fun repo(
         dao: QuoteDao = mockk(relaxed = true),
