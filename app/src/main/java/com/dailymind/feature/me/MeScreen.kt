@@ -28,12 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dailymind.BuildConfig
 import com.dailymind.core.datastore.ThemeMode
 import com.dailymind.core.designsystem.EditorialEmpty
 import com.dailymind.core.designsystem.IndexRow
 import com.dailymind.core.designsystem.SettingRow
-
-private const val APP_VERSION = "0.1.0-beta.1"
 
 @Composable
 fun MeScreen(
@@ -63,7 +62,7 @@ fun MeScreen(
                 Spacer(modifier = Modifier.height(64.dp))
                 Text(text = "Me", style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "${list.size} saved · DailyMind $APP_VERSION", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "${list.size} saved · DailyMind ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(32.dp))
                 Text(text = "SAVED", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -129,7 +128,7 @@ private fun AboutDialog(onDismiss: () -> Unit) {
         },
         title = { Text(text = "DailyMind", style = MaterialTheme.typography.headlineSmall) },
         text = {
-            Text(text = "Offline-first daily quotes. Version $APP_VERSION.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = "Offline-first daily quotes. Version ${BuildConfig.VERSION_NAME}.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     )
 }
