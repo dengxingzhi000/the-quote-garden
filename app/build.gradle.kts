@@ -18,20 +18,24 @@ android {
         versionName = "0.1.0-beta.1"
     }
     signingConfigs {
-        create("beta") {
+        maybeCreate("beta").apply {
             val keystoreProps = Properties().apply {
                 val f = rootProject.file("local.properties")
                 if (f.exists()) f.inputStream().use { stream -> load(stream) }
             }
-            storeFile = rootProject.file(keystoreProps.getProperty("KEYSTORE_PATH"))
-            storePassword = keystoreProps.getProperty("KEYSTORE_PASSWORD")
-            keyAlias = keystoreProps.getProperty("KEY_ALIAS")
-            keyPassword = keystoreProps.getProperty("KEY_PASSWORD")
+            if (keystoreProps.getProperty("KEYSTORE_PATH") != null) {
+                storeFile = rootProject.file(keystoreProps.getProperty("KEYSTORE_PATH"))
+                storePassword = keystoreProps.getProperty("KEYSTORE_PASSWORD")
+                keyAlias = keystoreProps.getProperty("KEY_ALIAS")
+                keyPassword = keystoreProps.getProperty("KEY_PASSWORD")
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("beta")
+            if (signingConfigs.findByName("beta")?.storeFile != null) {
+                signingConfig = signingConfigs.getByName("beta")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
