@@ -7,6 +7,17 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    # Neon free tier routes through PgBouncer in transaction mode, which
+    # rejects server-side prepared statements and shared connection state.
+    # Disable both, and pin a sane maximum-pool-size that fits the 512 MB
+    # Render free tier.
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 10000
+      data-source-properties:
+        prepareThreshold: 0
+        cachePrepStmts: false
 
   jpa:
     hibernate:
