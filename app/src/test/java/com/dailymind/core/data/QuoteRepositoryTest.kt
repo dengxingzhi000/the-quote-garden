@@ -16,10 +16,8 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class QuoteRepositoryTest {
@@ -132,7 +130,6 @@ class QuoteRepositoryTest {
 
     @Test fun `getLocalRandomQuote excludes specified id`() = runTest {
         val dao = mockk<QuoteDao>()
-        val q1 = QuoteEntity("1", "A", "甲", "X", "c", 1, null, null, 1L, null)
         val q2 = QuoteEntity("2", "B", "乙", "Y", "c", 1, null, null, 2L, null)
         coEvery { dao.getRandomExcluding("1") } returns q2
         val q = repo(dao = dao).getLocalRandomQuote(excludeId = "1")!!
