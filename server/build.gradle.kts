@@ -11,6 +11,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql:11.20.3")
     implementation("org.postgresql:postgresql")
     implementation("org.jsoup:jsoup:1.18.3")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
