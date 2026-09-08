@@ -9,7 +9,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,8 +40,7 @@ import kotlinx.datetime.toLocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToFavorite: () -> Unit = {}
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -71,20 +69,11 @@ fun HomeScreen(
                     label = "topBar"
                 ) { browsing ->
                     if (browsing) {
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            TextAction(
-                                label = "Saved →",
-                                onClick = onNavigateToFavorite,
-                                modifier = Modifier.align(androidx.compose.ui.Alignment.CenterEnd)
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(48.dp))
                     } else {
                         EditorialTopBar(
                             date = date,
-                            greeting = greeting,
-                            action = {
-                                TextAction(label = "Saved →", onClick = onNavigateToFavorite)
-                            }
+                            greeting = greeting
                         )
                     }
                 }
