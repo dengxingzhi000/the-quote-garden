@@ -59,12 +59,18 @@ fun EditorialTopBar(
 
 @Composable
 fun QuoteBlock(quote: Quote, modifier: Modifier = Modifier) {
+    val segments = remember(quote.id, quote.content) {
+        splitQuoteSegments(quote.content).ifEmpty { listOf(quote.content) }
+    }
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = quote.content,
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        segments.forEachIndexed { index, segment ->
+            Text(
+                text = segment,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            if (index < segments.lastIndex) Spacer(modifier = Modifier.height(12.dp))
+        }
         Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
         Spacer(modifier = Modifier.height(24.dp))
