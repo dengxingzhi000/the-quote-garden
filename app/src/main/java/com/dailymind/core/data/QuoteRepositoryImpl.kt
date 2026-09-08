@@ -54,6 +54,13 @@ class QuoteRepositoryImpl @Inject constructor(
         return entity.toModel()
     }
 
+    override suspend fun getLocalRandomQuote(excludeId: String?): Quote? =
+        if (excludeId == null) dao.getRandom()?.toModel()
+        else dao.getRandomExcluding(excludeId)?.toModel()
+
+    override fun observeFavoriteIds(): Flow<Set<String>> =
+        favorites.observeFavorites().map { list -> list.map { it.id }.toSet() }
+
     override suspend fun getRandomQuote(): Quote =
         try {
             val dto = api.getRandomQuote()

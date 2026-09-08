@@ -16,8 +16,10 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class QuoteRepositoryTest {
@@ -126,5 +128,38 @@ class QuoteRepositoryTest {
         coEvery { favorites.observeFavorites() } returns flowOf(listOf(entity))
         val list = repo(favorites = favorites).observeFavorites().first()
         assertEquals(listOf("9"), list.map { it.id })
+    }
+
+    @Test fun `getLocalRandomQuote excludes specified id`() = runTest {
+        val dao = mockk<QuoteDao>()
+        val q1 = QuoteEntity("1", "A", "甲", "X", "c", 1, null, null, 1L, null)
+        val q2 = QuoteEntity("2", "B", "乙", "Y", "c", 1, null, null, 2L, null)
+        coEvery { dao.getRandomExcluding("1") } returns q2
+        val q = repo(dao = dao).getLocalRandomQuote(excludeId = "1")!!
+        assertEquals("2", q.id)
+        coVerify { dao.getRandomExcluding("1") }
+    }
+
+    @Test fun `getLocalRandomQuote returns null on empty db`() = runTest {
+        val dao = mockk<QuoteDao>()
+        coEvery { dao.getRandomExcluding("any") } returns null
+        assertNull(repo(dao = dao).getLocalRandomQuote(excludeId = "any"))
+    }
+
+    @Test fun `getLocalRandomQuote calls getRandom when excludeId null`() = runTest {
+        val dao = mockk<QuoteDao>()
+        coEvery { dao.getRandom() } returns entity
+        val q = repo(dao = dao).getLocalRandomQuote(excludeId = null)!!
+        assertEquals("9", q.id)
+        coVerify(exactly = 0) { dao.getRandomExcluding(any()) }
+    }
+
+    @Test fun `observeFavoriteIds emits id set from favorites flow`() = runTest {
+        val favorites = mockk<FavoriteDao>()
+        coEvery { favorites.observeFavorites() } returns flowOf(
+            listOf(entity, entity.copy(id = "8", content = "Other"))
+        )
+        val ids = repo(favorites = favorites).observeFavoriteIds().first()
+        assertEquals(setOf("9", "8"), ids)
     }
 }
