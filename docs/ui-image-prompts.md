@@ -416,8 +416,8 @@ Format: PNG.
 Subject: a heart made of leaves, or a hand cradling a glowing book. Suggests care and personal collection. Bottom 25 percent is reserved for text overlay.
 
 Display context: full screen width on portrait phones, 3:2 aspect ratio. Title text overlays the bottom quarter.
-Output filename: onboard_3.png
-Drop into: res/drawable-nodpi/onboard_3.png
+Output filename: ic_favorites.png
+Drop into: res/drawable-nodpi/ic_favorites.png
 ```
 
 ---
