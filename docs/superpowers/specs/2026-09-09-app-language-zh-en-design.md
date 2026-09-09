@@ -26,6 +26,7 @@ data class AppStrings(
     // common
     val retry: String,
     val close: String,
+    val errorTitle: String,    // "Something went quiet" / "这里静悄悄"
     val back: String,
     // bottom tabs
     val tabToday: String,
@@ -54,11 +55,15 @@ data class AppStrings(
     val categoriesLines: (Int, Int) -> String, // "N categories - M lines"
     val linesCount: (Int) -> String,           // "N lines"
     val goHome: String,
+    val browseEmptyTitle: String, // "Nothing to browse yet" / "暂无分类"
+    val browseEmptyBody: String,  // "Pull to sync on Home." / "去首页同步试试。"
     // category detail
-    val backLabel: String,     // "<- Back" / "<- 返回"
+    val backArrow: String,     // "<- Back" / "<- 返回"
+    val back: String,          // "Back" / "返回"
+    val detailEmptyTitle: String, // "This category is empty" / "该分类是空的"
+    val detailEmptyBody: String,  // "Pull to sync or pick another." / "同步后重试，或换个分类。"
     // me
-    val meTitle: String,         // "Me" / "我的"
-    val savedCount: (Int) -> String, // "N saved" / "已存 N 条"
+    val meTitle: String,         // "Me" / "我的"    val savedCount: (Int) -> String, // "N saved" / "已存 N 条"
     val savedHeading: String,    // "SAVED" / "已保存"
     val settingsHeading: String, // "SETTINGS" / "设置"
     val languageSetting: String, // "Language" / "语言"
@@ -77,6 +82,7 @@ data class AppStrings(
     val contactTitle: String,
     val contactBody: String,   // WeChat QR line, translated per §7 table
     val contactHint: String,   // long-press hint
+    val contactQrDesc: String, // accessibility: "WeChat QR code" / "微信二维码"
 )
 
 val ZhStrings = AppStrings(...)
@@ -94,11 +100,15 @@ enum class AppLanguage { ZH, EN }
 @Singleton
 class LanguageStore @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val systemLocale: () -> Locale = { Locale.getDefault() },
 ) {
+    // Hilt cannot inject default constructor params, so the system-locale rule
+    // lives in a plain method with a default argument instead of a lambda dep.
+    fun defaultLanguage(locale: Locale = Locale.getDefault()): AppLanguage =
+        if (locale.language == "en") AppLanguage.EN else AppLanguage.ZH
+
     val language: Flow<AppLanguage> = dataStore.data.map { prefs ->
         prefs[PreferencesKeys.LANGUAGE]?.let { runCatching { AppLanguage.valueOf(it) }.getOrNull() }
-            ?: if (systemLocale().language == "en") AppLanguage.EN else AppLanguage.ZH
+            ?: defaultLanguage()
     }
     suspend fun setLanguage(lang: AppLanguage) {
         dataStore.edit { prefs -> prefs[PreferencesKeys.LANGUAGE] = lang.name }
@@ -124,7 +134,7 @@ class LanguageStore @Inject constructor(
 
 ## 6. Testing
 
-- `LanguageStoreTest`: set/get roundtrip ZH↔EN; invalid stored value falls back to system rule; default follows injected fake `systemLocale` (`en` → EN, `zh`/`fr`/other → ZH).
+- `LanguageStoreTest`: set/get roundtrip ZH↔EN; invalid stored value falls back to `defaultLanguage()`; `defaultLanguage(Locale("en"))` is EN, `Locale("zh")`/`Locale("fr")` are ZH. DataStore faked with the `MutableStateFlow` + `updateData` mock pattern from `CategoryPreferenceStoreTest`.
 - `MeViewModelTest`: construct with mocked `LanguageStore`, existing tests keep passing.
 - Data class guarantees ZH/EN field parity at compile time — no parity test needed.
 - Full regression `:app:test` (excluding the 2 known pre-existing `BrowseViewModelTest` failures).
@@ -134,6 +144,7 @@ class LanguageStore @Inject constructor(
 | Key | EN | ZH |
 |---|---|---|
 | retry | Retry | 重试 |
+| errorTitle | Something went quiet | 这里静悄悄 |
 | close | Close | 关闭 |
 | back | Back | 返回 |
 | tabToday / tabBrowse / tabMe | Today / Browse / Me | 今日 / 逛逛 / 我的 |
@@ -151,7 +162,9 @@ class LanguageStore @Inject constructor(
 | categoriesLines | "$c categories - $q lines" | "共 $c 个分类 · $q 条" |
 | linesCount | "$n lines" | "$n 条" |
 | goHome | Go to Home | 回首页 |
-| backLabel | <- Back | <- 返回 |
+| backArrow / back | <- Back / Back | <- 返回 / 返回 |
+| browseEmptyTitle/Body | Nothing to browse yet / Pull to sync on Home. | 暂无分类 / 去首页同步试试。 |
+| detailEmptyTitle/Body | This category is empty / Pull to sync or pick another. | 该分类是空的 / 同步后重试，或换个分类。 |
 | meTitle | Me | 我的 |
 | savedCount | "$n saved" | "已存 $n 条" |
 | savedHeading / settingsHeading | SAVED / SETTINGS | 已保存 / 设置 |
