@@ -15,8 +15,8 @@
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="The Quote Garden"
-        android:theme="@android:style/Theme.Material.Light">
+        android:label="DailyMind"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
             android:name=".MainActivity"
             android:exported="true">
