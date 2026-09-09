@@ -113,4 +113,36 @@ class HomeViewModelTest {
         assertEquals(0, vm.uiState.value.historyIndex)
         coVerify(exactly = 1) { repo.getLocalRandomQuote(any(), any()) }
     }
+
+    @Test fun `history capped at 20 dropping oldest`() = runTest {
+        val repo = mockk<QuoteRepository>(relaxed = true)
+        every { repo.observeFavoriteIds() } returns flowOf(emptySet())
+        every { repo.observeCategoryCounts() } returns flowOf(emptyList())
+        coEvery { repo.getLocalRandomQuote(any(), any()) } answers {
+            val exclude = firstArg<String?>()
+            quote("n-$exclude", "Q-n-$exclude")
+        }
+        val vm = HomeViewModel(repo, categoryStore())
+        @Suppress("UNCHECKED_CAST")
+        (vm.uiState as MutableStateFlow<HomeUiState>).value = vm.uiState.value.copy(
+            quote = quote("0"),
+            history = listOf(quote("0")),
+            historyIndex = 0,
+        )
+        repeat(25) { vm.onEvent(HomeEvent.NextRandom) }
+        assertEquals(20, vm.uiState.value.history.size)
+        assertEquals(19, vm.uiState.value.historyIndex)
+    }
+
+    @Test fun `Load resets history to single element`() = runTest {
+        val repo = mockk<QuoteRepository>()
+        coEvery { repo.getDailyQuote(null) } returns quote("9", "Q-9")
+        every { repo.observeFavoriteIds() } returns flowOf(emptySet())
+        every { repo.observeCategoryCounts() } returns flowOf(emptyList())
+        val vm = HomeViewModel(repo, categoryStore())
+        vm.onEvent(HomeEvent.Load)
+        assertEquals(1, vm.uiState.value.history.size)
+        assertEquals(0, vm.uiState.value.historyIndex)
+        assertEquals("Q-9", vm.uiState.value.quote?.content)
+    }
 }
