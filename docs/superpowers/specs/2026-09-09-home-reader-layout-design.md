@@ -35,7 +35,7 @@ Scaffold(bottomBar = HomeActionsBar) { padding ->
 - 長句：超出中央區 → 區內垂直滾動（`verticalScroll`），頁面整體仍不滾。
 - 橫滑 `detectHorizontalDragGestures`（80dp 閾值，左 Next / 右 Prev）掛在中央區 `Box` 上，與內部垂直滾動方向正交、互不干擾。
 - footnote（"Offline-first…"行 + 96dp spacer）刪除，保持閱讀器乾淨。
-- Loading / Error / Empty 三態同樣在中央區居中顯示（AnimatedVisibility 包裝保留）。
+- Loading 行保留在 header 區（與改前一致，即時反饋）；Error / Empty 在中央區居中顯示。
 
 ## 4. Gesture / scroll rules
 

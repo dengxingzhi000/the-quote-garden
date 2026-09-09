@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -20,8 +21,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -80,75 +82,60 @@ fun HomeScreen(
             }
         }
     ) { padding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
+                .padding(horizontal = 24.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(64.dp))
-                AnimatedContent(
-                    targetState = state.isBrowsing,
-                    transitionSpec = {
-                        (fadeIn(tween(200)) togetherWith fadeOut(tween(200)))
-                    },
-                    label = "topBar"
-                ) { browsing ->
-                    if (browsing) {
-                        Spacer(modifier = Modifier.height(48.dp))
-                    } else {
-                        EditorialTopBar(
-                            date = date,
-                            greeting = greeting
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(48.dp))
-            }
-            item {
-                CategoryChips(
-                    selected = state.selectedCategory,
-                    available = state.availableCategories,
-                    onPick = { viewModel.onEvent(HomeEvent.SelectCategory(it)) },
-                    onMore = { /* future: show full sheet */ }
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            item {
-                AnimatedVisibility(visible = state.quote != null && !state.isBrowsing) {
-                    Column {
-                        Text(
-                            text = "TODAY'S QUOTE",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                }
-            }
-            item {
-                AnimatedVisibility(visible = state.isLoading) {
-                    Text(
-                        text = "Loading...",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 24.dp)
+            Spacer(modifier = Modifier.height(64.dp))
+            AnimatedContent(
+                targetState = state.isBrowsing,
+                transitionSpec = {
+                    (fadeIn(tween(200)) togetherWith fadeOut(tween(200)))
+                },
+                label = "topBar"
+            ) { browsing ->
+                if (browsing) {
+                    Spacer(modifier = Modifier.height(48.dp))
+                } else {
+                    EditorialTopBar(
+                        date = date,
+                        greeting = greeting
                     )
                 }
             }
-            item {
-                AnimatedContent(
-                    targetState = state.quote?.id ?: state.error ?: "empty",
-                    transitionSpec = {
-                        (fadeIn(tween(200)) +
-                                slideInHorizontally(tween(200)) { it / 12 }) togetherWith
-                            (fadeOut(tween(200)) +
-                                    slideOutHorizontally(tween(200)) { -it / 12 })
-                    },
-                    label = "quoteContent",
-                    modifier = Modifier.pointerInput(state.quote?.id) {
+            Spacer(modifier = Modifier.height(48.dp))
+            CategoryChips(
+                selected = state.selectedCategory,
+                available = state.availableCategories,
+                onPick = { viewModel.onEvent(HomeEvent.SelectCategory(it)) },
+                onMore = { /* future: show full sheet */ }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            AnimatedVisibility(visible = state.quote != null && !state.isBrowsing) {
+                Column {
+                    Text(
+                        text = "TODAY'S QUOTE",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+            AnimatedVisibility(visible = state.isLoading) {
+                Text(
+                    text = "Loading...",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .pointerInput(state.quote?.id) {
                         var totalX = 0f
                         detectHorizontalDragGestures(
                             onDragEnd = {
@@ -157,58 +144,58 @@ fun HomeScreen(
                                     totalX >= swipeThresholdPx -> viewModel.onEvent(HomeEvent.Prev)
                                 }
                                 totalX = 0f
-                            }
+                            },
+                            onDragCancel = { totalX = 0f }
                         ) { _, dragAmount ->
                             totalX += dragAmount
                         }
                     },
-                ) { key ->
-                    val quote = state.quote
-                    val error = state.error
-                    when {
-                        quote != null && key == quote.id -> {
-                            QuoteBlock(quote = quote)
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
-                        error != null && key == error -> {
-                            EditorialError(
-                                message = error,
-                                onRetry = { viewModel.onEvent(HomeEvent.Load) }
-                            )
-                        }
-                        key == "empty" && !state.isLoading -> {
-                            when (state.emptyMode) {
-                                EmptyMode.NoCategoryLines -> EditorialEmpty(
-                                    title = "No lines in this category yet",
-                                    body = "This category hasn't been synced to your device.",
-                                    actionLabel = "Switch to All",
-                                    onAction = { viewModel.onEvent(HomeEvent.SelectCategory(null)) }
-                                )
-                                EmptyMode.Generic -> EditorialEmpty(
-                                    title = "Nothing here yet",
-                                    body = "Check your connection and try again.",
-                                    actionLabel = "Retry",
-                                    onAction = { viewModel.onEvent(HomeEvent.Load) }
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier.verticalScroll(remember(state.quote?.id) { ScrollState(0) })
+                ) {
+                    AnimatedContent(
+                        targetState = state.quote?.id ?: state.error ?: "empty",
+                        transitionSpec = {
+                            (fadeIn(tween(200)) +
+                                    slideInHorizontally(tween(200)) { it / 12 }) togetherWith
+                                (fadeOut(tween(200)) +
+                                        slideOutHorizontally(tween(200)) { -it / 12 })
+                        },
+                        label = "quoteContent"
+                    ) { key ->
+                        val shown = state.history.find { it.id == key } ?: state.quote
+                        val quote = shown?.takeIf { it.id == key }
+                        val error = if (quote == null) state.error else null
+                        when {
+                            quote != null && key == quote.id -> {
+                                QuoteBlock(quote = quote)
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                            error != null && key == error -> {
+                                EditorialError(
+                                    message = error,
+                                    onRetry = { viewModel.onEvent(HomeEvent.Load) }
                                 )
                             }
+                            key == "empty" && !state.isLoading -> {
+                                when (state.emptyMode) {
+                                    EmptyMode.NoCategoryLines -> EditorialEmpty(
+                                        title = "No lines in this category yet",
+                                        body = "This category hasn't been synced to your device.",
+                                        actionLabel = "Switch to All",
+                                        onAction = { viewModel.onEvent(HomeEvent.SelectCategory(null)) }
+                                    )
+                                    EmptyMode.Generic -> EditorialEmpty(
+                                        title = "Nothing here yet",
+                                        body = "Check your connection and try again.",
+                                        actionLabel = "Retry",
+                                        onAction = { viewModel.onEvent(HomeEvent.Load) }
+                                    )
+                                }
+                            }
                         }
-                    }
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-            item {
-                AnimatedVisibility(visible = !state.isBrowsing) {
-                    Column {
-                        Spacer(modifier = Modifier.height(48.dp))
-                        Text(
-                            text = "Offline-first - cached first, syncs quietly",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                        Spacer(modifier = Modifier.height(32.dp))
-                        Spacer(modifier = Modifier.height(96.dp))
                     }
                 }
             }
