@@ -24,7 +24,7 @@ Scaffold(bottomBar = HomeActionsBar) { padding ->
             TODAY'S QUOTE + Loading 行)
     QuoteZone (Modifier.weight(1f).fillMaxWidth() + 橫滑 pointerInput)
       Box(contentAlignment = Center)
-        Column(Modifier.verticalScroll(rememberScrollState())) {
+        Column(Modifier.verticalScroll(remember(quoteId) { ScrollState(0) })) {
           AnimatedContent(quote/error/empty, 橫向過渡保持) { QuoteBlock / EditorialError / EditorialEmpty }
         }
   }
