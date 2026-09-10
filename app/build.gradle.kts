@@ -15,8 +15,8 @@ android {
         applicationId = "com.quotegarden"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 7
+        versionName = "0.7.0"
     }
     signingConfigs {
         maybeCreate("beta").apply {
