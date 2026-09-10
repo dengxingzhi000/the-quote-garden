@@ -270,7 +270,7 @@ Subject: a mountain peak, a flame, a lion's mane, or a sword. Suggests bravery.
 
 Display context: shown at 56 x 56 dp in the Courage category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
 Output filename: category_courage.png
-Drop into: res/drawable-nodpi/category_courage.png
+Drop into: res/drawable/category_courage.png
 ```
 
 ---
@@ -288,7 +288,7 @@ Subject: a smile, a laughing face, a sun with a grin, or a balloon. Light, playf
 
 Display context: shown at 56 x 56 dp in the Humor category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
 Output filename: category_humor.png
-Drop into: res/drawable-nodpi/category_humor.png
+Drop into: res/drawable/category_humor.png
 ```
 
 ---
@@ -306,7 +306,7 @@ Subject: a sprouting seedling, a single leaf on a stem, a tree of life, or hands
 
 Display context: shown at 56 x 56 dp in the Life category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
 Output filename: category_life.png
-Drop into: res/drawable-nodpi/category_life.png
+Drop into: res/drawable/category_life.png
 ```
 
 ---
@@ -541,6 +541,227 @@ Drop into: res/drawable-nodpi/
 
 ---
 
+e: file:///D:/ProgramProject/Andorid_Project/app/src/main/java/com/quotegarden/feature/home/HomeScreen.kt:33:43 Unresolved reference 'matchParentSize'.
+
+
+---
+
+## 30. Category Tile - adventure
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: exploration and the open road - a compass rose with a single highlighted needle, a mountain path winding into the distance, a small sailboat on a horizon, an open trail through two trees. Choose one motif only. Inviting, not perilous.
+
+Display context: shown at 56 x 56 dp in the adventure category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: adventure.png
+Drop into: res/drawable/adventure.png
+```
+
+---
+
+## 31. Category Tile - adversity
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: resilience through difficulty - a small green sprout pushing through a crack in stone, waves breaking against rocks with foam, a single candle flame bending in wind but not going out, a tree bent by storm but still rooted. Choose one motif only. Should feel honest about hardship but not bleak.
+
+Display context: shown at 56 x 56 dp in the adversity category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: adversity.png
+Drop into: res/drawable/adversity.png
+```
+
+---
+
+## 32. Category Tile - advice
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: gentle guidance - an open palm extended outward, a small glowing lantern held up, an arrow pointing forward across an open page, a hand offering a single seed or small leaf. Choose one motif only. Warm, not preachy.
+
+Display context: shown at 56 x 56 dp in the advice category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: advice.png
+Drop into: res/drawable/advice.png
+```
+
+---
+
+## 33. Category Tile - afternoon
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: the slow warm middle of the day - a low warm sun near the horizon casting long parallel shadows, a steaming cup of tea beside an open book, a hammock strung between two trees with a single cushion, a window with afternoon light spilling through half-open curtains. Choose one motif only. Suggests pause and warmth, not bedtime.
+
+Display context: shown at 56 x 56 dp in the afternoon category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: afternoon.png
+Drop into: res/drawable/afternoon.png
+```
+
+---
+
+## 34. Category Tile - age
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: time lived and time given - a cross-section of a tree trunk showing growth rings, an hourglass resting in cupped open hands, a side-profile silhouette of an older face with one or two soft line marks (no detailed wrinkles), a wooden cane leaning against the spine of a closed book. Choose one motif only. Reverent, not melancholy.
+
+Display context: shown at 56 x 56 dp in the age category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: age.png
+Drop into: res/drawable/age.png
+```
+
+---
+
+## 35. Category Tile - astrology
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: stars and small celestial patterns - a small constellation drawn as 5 to 7 connected dots with thin lines, a single large star with three or four smaller stars around it, a crescent moon with a sprinkle of small stars, a simple zodiac wheel with a single highlighted glyph. Choose one motif only. Quiet and a little mystical, not occult.
+
+Display context: shown at 56 x 56 dp in the astrology category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: astrology.png
+Drop into: res/drawable/astrology.png
+```
+
+---
+
+## 36. Category Tile - autumn
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: late-season, harvest-leaning imagery - one maple leaf turning warm red or amber with visible veins, an acorn still in its textured cap, a bare branch with one last leaf clinging to the tip, a small pumpkin or gourd with a single curled stem. Choose one motif only. Warm, slightly muted, not Halloween.
+
+Display context: shown at 56 x 56 dp in the autumn category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: autumn.png
+Drop into: res/drawable/autumn.png
+```
+
+---
+
+## 37. Category Tile - birds
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: a single bird motif - a small bird in flight with wings spread (silhouette or two-tone), a small songbird perched on a thin bare branch, a single long feather drifting. Choose one motif only. Calm, observational, not ornithological chart.
+
+Display context: shown at 56 x 56 dp in the birds category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: birds.png
+Drop into: res/drawable/birds.png
+```
+
+---
+
+## 38. Category Tile - blog-hawthorne-story-ideas
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: 19th-century writing desk - an inkwell with a quill resting across the top, a small stack of three or four manuscript pages tied with a thin cord and a single lit candle beside them, a closed leather-bound journal with a small clasp. Choose one motif only. Slightly moody, low light, very little color - cream and ink black with one warm accent.
+
+Display context: shown at 56 x 56 dp in the blog-hawthorne-story-ideas category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: blog_hawthorne_story_ideas.png
+Drop into: res/drawable/blog_hawthorne_story_ideas.png
+```
+
+---
+
+## 39. Category Tile - book-dedications
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: a small formal gesture toward a reader - an open book lying flat with a thin ribbon bookmark draped over the right-hand page, a quill resting on a single sheet of parchment with a single calligraphic flourish at the top, a closed book with a dedication plate visible on the inside cover. Choose one motif only. Quiet, ceremonial, intimate.
+
+Display context: shown at 56 x 56 dp in the book-dedications category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: category_book-dedications.png
+Drop into: res/drawable-nodpi/category_book-dedications.png
+```
+
+---
+
+## 40. Category Tile - create-your-own-quote-contests
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: participation and recognition - a simple laurel wreath tied at the bottom with a thin ribbon, a small stage with a single warm spotlight, a podium with a small banner unfurled, a hanging medal or ribbon rosette. Choose one motif only. Inviting, not corporate.
+
+Display context: shown at 56 x 56 dp in the create-your-own-quote-contests category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: create_your_own_quote_contests.png
+Drop into: res/drawable/create_your_own_quote_contests.png
+```
+
+---
+
+## 41. Category Tile - safari-unhand-your-pearls
+
+```
+Target platform: Android (category thumbnail)
+
+Generate a single PNG image at exactly 128 x 128 pixels.
+Background: fully transparent.
+Format: PNG with alpha channel.
+
+Subject: a single hybrid motif pairing the two halves of the collection name - a pearl resting in an open shell (the "pearls" half), a wide-brimmed safari hat with one tall ostrich plume tucked into the band (the "safari" half). Choose ONE of those two motifs only; do not try to draw both together. Slightly warm savanna palette, but very limited color - cream, sand, one warm rust accent, plus the pearl white.
+
+Display context: shown at 56 x 56 dp in the safari-unhand-your-pearls category tile on Browse, and reused at 40 x 40 dp in the CategoryDetail screen header.
+Output filename: safari_unhand_your_pearls.png
+Drop into: res/drawable/safari_unhand_your_pearls.png
+```
+
+---
+
 ## Quality Checklist Before Submitting Each Asset
 
 1. **Pixel size matches exactly** (e.g. 432 x 432 for the app icon, not 500 x 500)
@@ -552,7 +773,7 @@ Drop into: res/drawable-nodpi/
 
 ## Final Build Step
 
-After all 28 assets are in place, run a clean build from the repo root:
+After all 41 assets are in place, run a clean build from the repo root:
 
 ```
 server/gradlew.bat :app:clean :app:assembleDebug

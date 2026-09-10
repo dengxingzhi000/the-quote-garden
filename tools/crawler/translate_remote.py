@@ -97,7 +97,7 @@ def main():
         port=int(os.environ.get("PGPORT", "5432")),
         dbname=os.environ.get("PGDATABASE", "quote_garden"),
         user=os.environ.get("PGUSER", "admin"),
-        password=os.environ.get("PGPASSWORD", "123456"),
+        password=os.environ.get("PGPASSWORD", os.environ.get("SPRING_DATASOURCE_PASSWORD", "")),
         connect_timeout=10,
     )
     conn.set_session(autocommit=False)
