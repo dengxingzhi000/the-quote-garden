@@ -1,6 +1,13 @@
 spring:
   application:
-    name: dailymind-server
+    name: quotegarden-server
+
+  # Default profile = `local` so `bootRun` works out-of-the-box against the
+  # docker-compose Postgres on localhost:5432 (see application-local.yml).
+  # Production deploys MUST export SPRING_PROFILES_ACTIVE=prod to skip the
+  # local profile and rely solely on SPRING_DATASOURCE_* env vars below.
+  profiles:
+    default: local
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}

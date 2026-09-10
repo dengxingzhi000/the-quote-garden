@@ -1,6 +1,6 @@
-# AGENTS.md — DailyMind
+# AGENTS.md — Quote Garden
 
-DailyMind is an offline-first Android daily-quote app with a Spring Boot backend. Two independent Gradle projects share this workspace.
+Quote Garden is an offline-first Android daily-quote app with a Spring Boot backend. Two independent Gradle projects share this workspace.
 
 ## Project layout
 
@@ -21,19 +21,19 @@ DailyMind is an offline-first Android daily-quote app with a Spring Boot backend
 
 - The repo root has no wrapper; run Android commands as `server/gradlew.bat ...`. That server wrapper is untracked.
 - App unit tests: `server/gradlew.bat :app:test`
-- Focused Android unit test: `server/gradlew.bat :app:testDebugUnitTest --tests "com.dailymind.sync.DailySyncWorkerTest"`
+- Focused Android unit test: `server/gradlew.bat :app:testDebugUnitTest --tests "com.quotegarden.sync.DailySyncWorkerTest"`
 - Do not pass `--tests` to aggregate `:app:test`; it rejects that option.
 - Server tests from `server/`: `.\gradlew.bat test`
-- Focused server test from `server/`: `.\gradlew.bat test --tests "com.dailymind.importer.NormalizerTest"`
+- Focused server test from `server/`: `.\gradlew.bat test --tests "com.quotegarden.importer.NormalizerTest"`
 - Server run/build from `server/`: `.\gradlew.bat bootRun`, `.\gradlew.bat build`
 - Active server database: remote PostgreSQL 18 `quote_garden` at `192.168.80.152:5432`.
-- Local database option: `cd server && docker compose up -d db` — PostgreSQL 16 on `localhost:5432`, db/user/pass all `dailymind`. It does not match the active remote default.
+- Local database option: `cd server && docker compose up -d db` — PostgreSQL 16 on `localhost:5432`, db/user/pass all `quotegarden`. It does not match the active remote default.
 - To switch databases, set `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD`; `SERVER_PORT` defaults to `8080`.
-- If `bootRun` reports port `8080` in use, check for an orphaned `DailyMindServerApplication` Java process before changing configuration.
+- If `bootRun` reports port `8080` in use, check for an orphaned `QuoteGardenServerApplication` Java process before changing configuration.
 
 ## Architecture
 
-**App (offline-first).** Room is the single source of truth. Repository exposes `Flow`; ViewModel holds `StateFlow` (UDF). WorkManager drives daily sync — `DailySyncWorker.enqueue` is called from `DailyMindApp.onCreate`. Hilt for DI. Retrofit + kotlinx.serialization for the network layer. `Application` uses `HiltWorkerFactory` to inject workers.
+**App (offline-first).** Room is the single source of truth. Repository exposes `Flow`; ViewModel holds `StateFlow` (UDF). WorkManager drives daily sync — `DailySyncWorker.enqueue` is called from `QuoteGardenApp.onCreate`. Hilt for DI. Retrofit + kotlinx.serialization for the network layer. `Application` uses `HiltWorkerFactory` to inject workers.
 
 Package layout: `core/{common,data,database,datastore,designsystem,model,navigation,network}` + `feature/{home,favorite}` + `sync/`.
 

@@ -33,4 +33,4 @@ What actually happened. Screenshots help.
 
 ## Logs
 
-If available, paste from `adb logcat` filtered by `DailySyncWorker`, `SeedImporter`, or the app's tag.
+If available, paste from `adb logcat` filtered by `DailySyncWorker` or the app's tag.

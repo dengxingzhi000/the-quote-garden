@@ -7,11 +7,11 @@
 -keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keep,includedescriptorclasses class com.dailymind.**$$serializer { *; }
--keepclassmembers class com.dailymind.** {
+-keep,includedescriptorclasses class com.quotegarden.**$$serializer { *; }
+-keepclassmembers class com.quotegarden.** {
     *** Companion;
 }
--keepclasseswithmembers class com.dailymind.** {
+-keepclasseswithmembers class com.quotegarden.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

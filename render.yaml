@@ -9,7 +9,7 @@
 
 services:
   - type: web
-    name: dailymind-server
+    name: quotegarden-server
     runtime: docker
     rootDir: server
     dockerfilePath: ./Dockerfile
