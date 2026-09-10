@@ -4,6 +4,9 @@ keystore/
 # Secrets
 local.properties
 *.properties.local
+.env
+.env.*
+!.env.example
 
 # Build artifacts
 build/
@@ -18,4 +21,10 @@ server/.gradle/
 
 # Local-only tooling
 .opencode/
+.superpowers/
 tools/crawler/__pycache__/
+tools/crawler/translation_cache*.json
+
+# SQLite WAL artifacts
+*.db-shm
+*.db-wal

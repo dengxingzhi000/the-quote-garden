@@ -86,7 +86,7 @@ class QuoteRepositoryTest {
         coEvery { api.getDailyQuote() } returns dto
         val quote = repo(dao = dao, api = api, store = store).getDailyQuote()
         assertEquals("Real content", quote?.content)
-        coVerify { dao.upsertAll(listOf(entity)) }
+        coVerify { dao.upsertAllPreserveTranslation(listOf(entity)) }
     }
 
     @Test fun `getRandomQuote fetches from network and caches`() = runTest {
@@ -95,7 +95,7 @@ class QuoteRepositoryTest {
         coEvery { api.getRandomQuote() } returns dto
         val quote = repo(dao = dao, api = api).getRandomQuote()
         assertEquals("Real content", quote.content)
-        coVerify { dao.upsertAll(listOf(entity)) }
+        coVerify { dao.upsertAllPreserveTranslation(listOf(entity)) }
     }
 
     @Test fun `getRandomQuote falls back to cache on network error`() = runTest {

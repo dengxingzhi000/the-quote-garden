@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup, Comment
 
 BASE = "https://www.quotegarden.com"
-UA = {"User-Agent": "DailyMindSeed/1.0"}
+UA = {"User-Agent": "QuoteGardenSeed/1.0"}
 ROOT = Path(__file__).parent
 PROGRESS = ROOT / "progress.json"
 # 名言与文章的长度分界（字符数），与服务端 V2 迁移及 QuoteGardenImporter 保持一致

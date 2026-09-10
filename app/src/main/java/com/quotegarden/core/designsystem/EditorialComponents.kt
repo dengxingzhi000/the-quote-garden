@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.RectangleShape
 import com.quotegarden.core.model.Quote
+import com.quotegarden.R
 
 @Composable
 fun EditorialTopBar(
@@ -106,17 +107,29 @@ fun QuoteBlock(quote: Quote, modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        if (!quote.author.isNullOrBlank()) {
-            Spacer(modifier = Modifier.height(16.dp))
+        if (!quote.translation.isNullOrBlank() || !quote.author.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
+        }
+        if (!quote.translation.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = quote.author,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = quote.translation,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontStyle = FontStyle.Italic
             )
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
+        if (!quote.author.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "— ${quote.author}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = androidx.compose.ui.text.style.TextAlign.End
+            )
+        }
     }
 }
 
@@ -261,18 +274,40 @@ private fun RowContent(
 }
 
 @Composable
-fun EditorialEmpty(title: String, body: String, actionLabel: String, onAction: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth().padding(vertical = 48.dp)) {
+fun EditorialEmpty(
+    title: String,
+    body: String,
+    actionLabel: String,
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    illustration: Int? = null,
+    illustrationSize: androidx.compose.ui.unit.Dp = 120.dp,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth().padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (illustration != null) {
+            Image(
+                painter = painterResource(id = illustration),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(illustrationSize)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
         Text(
             text = title,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = body,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
         TextAction(label = actionLabel, onClick = onAction)
@@ -280,18 +315,38 @@ fun EditorialEmpty(title: String, body: String, actionLabel: String, onAction: (
 }
 
 @Composable
-fun EditorialError(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth().padding(vertical = 48.dp)) {
+fun EditorialError(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+    illustration: Int? = null,
+    illustrationSize: androidx.compose.ui.unit.Dp = 120.dp,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth().padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (illustration != null) {
+            Image(
+                painter = painterResource(id = illustration),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(illustrationSize)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
         Text(
             text = "Something went quiet",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
         TextAction(label = "Retry", onClick = onRetry)

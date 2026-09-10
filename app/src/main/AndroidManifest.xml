@@ -11,11 +11,11 @@
     </queries>
 
     <application
-        android:name=".DailyMindApp"
+        android:name=".QuoteGardenApp"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="DailyMind"
+        android:label="Quote Garden"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
             android:name=".MainActivity"

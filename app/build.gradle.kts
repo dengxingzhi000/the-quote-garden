@@ -9,9 +9,10 @@ plugins {
     alias(libs.plugins.ksp)
 }
 android {
-    namespace = "com.dailymind"
+    namespace = "com.quotegarden"
     compileSdk = 36
     defaultConfig {
+        applicationId = "com.quotegarden"
         minSdk = 24
         targetSdk = 35
         versionCode = 2
@@ -52,6 +53,16 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
     }
     testOptions {
         unitTests {

@@ -1,5 +1,5 @@
 services:
   db:
     image: postgres:16
-    environment: { POSTGRES_DB: dailymind, POSTGRES_USER: dailymind, POSTGRES_PASSWORD: dailymind }
+    environment: { POSTGRES_DB: quotegarden, POSTGRES_USER: quotegarden, POSTGRES_PASSWORD: quotegarden }
     ports: ["5432:5432"]
